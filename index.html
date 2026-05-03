@@ -324,17 +324,7 @@ const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.
 document.querySelectorAll('.fi').forEach((el,i)=>{el.style.transitionDelay=(i%5)*.07+'s';io.observe(el);});
 
 const so = document.getElementById('s-online');
-
-async function updatePlayers() {
-  if (!so) return;
-  try {
-    const res = await fetch('https://YOUR-WORKER-URL.workers.dev/api/players');
-    const data = await res.json();
-    so.textContent = data.online ?? '-';
-  } catch(e) { so.textContent = '-'; }
-}
-
-if(so) { updatePlayers(); setInterval(updatePlayers, 1000); }
+if(so) so.textContent = '-';
 </script>
 </body>
 </html>
