@@ -328,7 +328,7 @@ const so = document.getElementById('s-online');
 async function updatePlayers() {
   if (!so) return;
   try {
-    const res = await fetch('https://api.mcsrvstat.us/3/smpaka.qzz.io');
+    const res = await fetch('https://api.mcsrvstat.us/3/smpaka.qzz.io?_t=' + Date.now());
     const d = await res.json();
     so.textContent = d.players?.online || 0;
   } catch { so.textContent = '-'; }
