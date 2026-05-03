@@ -327,14 +327,10 @@ async function updatePlayerCount() {
   const so = document.getElementById('s-online');
   if (!so) return;
   
-  try {
-    const res = await fetch('https://api.mcsrvstat.us/3/smpaka.qzz.io');
-    const data = await res.json();
-    console.log('API response:', JSON.stringify(data, null, 2));
-    so.textContent = data.players?.list?.length ?? data.players?.online ?? 0;
-  } catch(e) {
-    so.textContent = '-';
-  }
+  fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.mcsrvstat.us/3/smpaka.qzz.io'))
+    .then(r => r.json())
+    .then(d => { so.textContent = d.players?.online ?? '?'; })
+    .catch(() => { so.textContent = '?'; });
 }
 updatePlayerCount();
 setInterval(updatePlayerCount,500);
