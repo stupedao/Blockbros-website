@@ -261,7 +261,7 @@ Chat on Discord
 <p class="sec-p" style="margin-bottom:24px;">To maintain a safe and enjoyable environment, BlockBros uses strong anti-cheat systems and active moderation. Our staff team is friendly, responsive, and dedicated to keeping the server fair and welcoming for everyone. Respect between players is strongly enforced, helping create a positive and inclusive community.</p>
 <p class="sec-p" style="margin-bottom:24px;">Contact us on Discord for more info:</p>
 <a href="https://discord.gg/wxJEu3qU" class="btn btn-discord" target="_blank" style="display:inline-flex;align-items:center;gap:10px;padding:12px 24px;border-radius:10px;background:#5865F2;color:#fff;text-decoration:none;font-weight:600;font-size:0.95rem;">
-<img src="./images/Gemini_Generated_Image_xmo8y5xmo8y5xmo8.png" alt="Discord" width="24" height="24" style="vertical-align:middle;">Join Discord
+<img src="images/discord.png" alt="Discord" width="24" height="24" style="vertical-align:middle;">Join Discord
 </a>
 </div>
 </div>
@@ -323,18 +323,67 @@ function copyIP(){
 const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis');}),{threshold:.1});
 document.querySelectorAll('.fi').forEach((el,i)=>{el.style.transitionDelay=(i%5)*.07+'s';io.observe(el);});
 
-const so = document.getElementById('s-online');
+// ── Real-time player counter ──────────────────────────────────────────────
+const SERVER_IP = 'smpaka.qzz.io';
 
-async function updatePlayers() {
-  if (!so) return;
-  try {
-    const res = await fetch('https://api.mcsrvstat.us/3/smpaka.qzz.io?_t=' + Date.now());
-    const d = await res.json();
-    so.textContent = d.players?.online || 0;
-  } catch { so.textContent = '-'; }
+const soHero = document.getElementById('s-online');
+const hOnline = document.getElementById('h-online');
+
+function renderOnline(online, max) {
+  if (soHero) soHero.textContent = online;
+  if (hOnline) hOnline.innerHTML =
+    `<span style="display:inline-flex;align-items:center;gap:6px;">
+      <span style="width:7px;height:7px;border-radius:50%;background:#4ade80;
+        box-shadow:0 0 8px #4ade80;display:inline-block;
+        animation:blink 1.5s ease-in-out infinite;"></span>
+      <span style="font-size:.78rem;font-weight:700;color:#4ade80;letter-spacing:.05em;">
+        ${online} / ${max} online
+      </span>
+    </span>`;
 }
 
-if(so) { updatePlayers(); setInterval(updatePlayers, 2000); }
+function renderOffline() {
+  if (soHero) soHero.textContent = '0';
+  if (hOnline) hOnline.innerHTML =
+    `<span style="display:inline-flex;align-items:center;gap:6px;">
+      <span style="width:7px;height:7px;border-radius:50%;background:#f87171;display:inline-block;"></span>
+      <span style="font-size:.78rem;font-weight:600;color:rgba(200,175,235,0.6);letter-spacing:.05em;">
+        Server offline
+      </span>
+    </span>`;
+}
+
+// Try mcsrvstat v3 (preferred), fallback to mcstatus.io
+async function fetchPlayerCount() {
+  // --- API 1: mcsrvstat.us v3 ---
+  try {
+    const r = await fetch(`https://api.mcsrvstat.us/3/${SERVER_IP}`, {cache:'no-store'});
+    if (r.ok) {
+      const d = await r.json();
+      if (d.online) { renderOnline(d.players?.online ?? 0, d.players?.max ?? '?'); return; }
+    }
+  } catch(_) {}
+
+  // --- API 2: mcstatus.io ---
+  try {
+    const r = await fetch(`https://api.mcstatus.io/v2/status/java/${SERVER_IP}`, {cache:'no-store'});
+    if (r.ok) {
+      const d = await r.json();
+      if (d.online) { renderOnline(d.players?.online ?? 0, d.players?.max ?? '?'); return; }
+    }
+  } catch(_) {}
+
+  // Both APIs say offline (or unreachable)
+  renderOffline();
+}
+
+// Loading state
+if (soHero) soHero.textContent = '…';
+if (hOnline) hOnline.innerHTML =
+  `<span style="font-size:.78rem;color:rgba(200,175,235,0.55);">Checking server…</span>`;
+
+fetchPlayerCount();
+setInterval(fetchPlayerCount, 60_000);
 </script>
 </body>
 </html>
