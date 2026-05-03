@@ -324,7 +324,17 @@ const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.
 document.querySelectorAll('.fi').forEach((el,i)=>{el.style.transitionDelay=(i%5)*.07+'s';io.observe(el);});
 
 const so = document.getElementById('s-online');
-if(so) so.textContent = '-';
+
+async function updatePlayers() {
+  if (!so) return;
+  try {
+    const res = await fetch('https://api.mcsrvstat.us/3/smpaka.qzz.io');
+    const d = await res.json();
+    so.textContent = d.players?.online || 0;
+  } catch { so.textContent = '-'; }
+}
+
+if(so) { updatePlayers(); setInterval(updatePlayers, 2000); }
 </script>
 </body>
 </html>
