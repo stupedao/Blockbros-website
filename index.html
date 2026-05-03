@@ -323,15 +323,8 @@ function copyIP(){
 const io=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis');}),{threshold:.1});
 document.querySelectorAll('.fi').forEach((el,i)=>{el.style.transitionDelay=(i%5)*.07+'s';io.observe(el);});
 
-async function updatePlayerCount() {
-  const so = document.getElementById('s-online');
-  if (!so) return;
-  
-  fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.mcsrvstat.us/3/smpaka.qzz.io'))
-    .then(r => r.json())
-    .then(d => { so.textContent = d.players?.online ?? '?'; })
-    .catch(() => { so.textContent = '?'; });
-}
+const so = document.getElementById('s-online');
+if(so) so.textContent = '-';
 updatePlayerCount();
 setInterval(updatePlayerCount,500);
 </script>
